@@ -1,0 +1,140 @@
+﻿@model ToDoList.Models.ViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+        @(Model.CurrentList == null ? "Домашняя страница" : Model.CurrentList.Name)
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/Content/bootstrap.css" />
+    <link rel="stylesheet" href="~/Content/bootstrap-theme.min.css" />
+    <link rel="stylesheet" href="~/Content/bootstrap-theme.css" />
+    <link rel="stylesheet" href="~/Content/Site.css" />
+</head>
+<body>
+    <input type="checkbox" id="hmt" class="hidden-menu-ticker">
+    <label class="btn-menu" for="hmt">
+        <span class="first"></span>
+        <span class="second"></span>
+        <span class="third"></span>
+    </label>
+    <ul class="hidden-menu">
+        @foreach (var taskList in Model.ListCatalog)
+        {
+            <li id="grid">
+                <div>
+                    @using (Html.BeginForm("OpenList", "Home"))
+                    {
+                        <button class="btn btn-light col-xl-11 sidebar-input"
+                                style="height: 35px; margin-top: 3px;" name="Id"
+                                value=@taskList.Id type="submit">
+                            @taskList.Name
+                        </button>
+                    }
+                </div>
+                <div>
+                    @using (Html.BeginForm("DeleteList", "Home"))
+                    {
+                        <button class="btn btn-circle" type="submit"
+                                name="Id" style="position:relative" value=@taskList.Id>
+                            🧺
+                        </button>
+                    }
+                </div>
+            </li>
+        }
+
+        @using (Html.BeginForm("AddList", "Home"))
+        {
+            <p>
+                <input name="name"
+                       class="form-control list-input col-xl-9 sidebar-input"
+                       placeholder="Новый список" maxlength="40" />
+            </p>
+            <button type="submit"
+                    class="btn btn-light sidebar-input">
+                Добавить
+            </button>
+        }
+
+    </ul>
+    @if (Model.CurrentList != null)
+    {
+        <div class="content">
+            <div class="inner-content">
+                <div class="list-name">
+                    @Model.CurrentList.Name
+                </div>
+
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col" width="50px"></th>
+                            <th scope="col" width="800px">Описание</th>
+                            <th scope="col" width="150px">Дата</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var t in Model.TaskList)
+                        {
+
+                            <tr class=@t.Color style="height:50px">
+                                <th scope="row">
+                                    <div class="form-check">
+                                        @using (Html.BeginForm("DeleteTask", "Home"))
+                                        {
+                                            <button class="btn btn-circle" type="submit"
+                                                    name="Id" value=@t.Id>
+                                                ✓
+                                            </button>
+                                        }
+                                    </div>
+                                </th>
+                                <td>@t.Description</td>
+                                <td>@t.Date</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="new-task">
+                    @using (Html.BeginForm("AddTask", "Home"))
+                    {
+                        <input class="form-control list-input col-xl-8 sidebar-input" placeholder="Новая задача" name="description" maxlength="120" />
+                        <div class="options">
+                            <select class="custom-select col-xl-2 sidebar-input" name="color">
+                                <option value="" hidden disabled selected>Цвет:</option>
+                                <option value="table-active" class="table-active"></option>
+                                <option value="table-default"></option>
+                                <option value="table-primary" class="table-primary"></option>
+                                <option value="table-secondary" class="table-secondary"></option>
+                                <option value="table-success" class="table-success"></option>
+                                <option value="table-warning" class="table-warning"></option>
+                                <option value="table-danger" class="table-danger"></option>
+                                <option value="table-info" class="table-info"></option>
+                            </select>
+                            <input type="date" class="form-control col-xl-2 sidebar-input" name="date" />
+                            <button class="btn btn-light sidebar-input" type="submit">Добавить</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div style="text-align:center; margin-top: 10%">
+            <h2>
+                Выберите список из меню слева.
+            </h2>
+        </div>
+    }
+</body>
+</html>
