@@ -11,7 +11,7 @@ namespace ToDoList.Controllers
         public ActionResult Index()
         {
 
-            return View(UpdateViewModel());
+            return View(GetViewModel());
         }
 
         public ActionResult OpenList(int Id)
@@ -23,7 +23,7 @@ namespace ToDoList.Controllers
                                   select list)?.First();
 
                 ViewModel.CurrentList = targetList;
-                return View("Index", UpdateViewModel());
+                return View("Index", GetViewModel());
             }
         }
 
@@ -34,7 +34,7 @@ namespace ToDoList.Controllers
                 db.TaskLists.Add(new TaskList(name));
                 db.SaveChanges();
 
-                return View("Index", UpdateViewModel());
+                return View("Index", GetViewModel());
             }
         }
         public ActionResult DeleteList(int Id)
@@ -52,7 +52,7 @@ namespace ToDoList.Controllers
                 db.TaskLists.Remove(targetList);
                 db.SaveChanges();
 
-                return View("Index", UpdateViewModel());
+                return View("Index", GetViewModel());
             }
         }
 
@@ -64,7 +64,7 @@ namespace ToDoList.Controllers
                 db.Tasks.Add(NewTask);
                 db.SaveChanges();
 
-                return View("Index", UpdateViewModel());
+                return View("Index", GetViewModel());
             }
         }
 
@@ -79,7 +79,7 @@ namespace ToDoList.Controllers
                 db.Tasks.Remove(task);
                 db.SaveChanges();
 
-                return View("Index", UpdateViewModel());
+                return View("Index", GetViewModel());
             }
 
         }
@@ -111,7 +111,7 @@ namespace ToDoList.Controllers
             }
         }
 
-        public static ViewModel UpdateViewModel()
+        public static ViewModel GetViewModel()
         {
             ViewModel.TaskList = GetTasks();
             ViewModel.ListCatalog = GetTaskLists();
