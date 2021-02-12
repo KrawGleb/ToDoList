@@ -8,6 +8,8 @@ namespace ToDoList.Controllers
     public class HomeController : Controller
     {
         static ViewModel ViewModel = new ViewModel();
+        static TaskContext TaskDb = new TaskContext();
+        static TaskListContext ListDb = new TaskListContext();
         public ActionResult Index()
         {
 
@@ -16,99 +18,82 @@ namespace ToDoList.Controllers
 
         public ActionResult OpenList(int Id)
         {
-            using (TaskListContext db = new TaskListContext())
-            {
-                var targetList = (from list in db.TaskLists
-                                  where list.Id == Id
-                                  select list)?.First();
+            var targetList = (from list in ListDb.TaskLists
+                              where list.Id == Id
+                              select list)?.First();
 
-                ViewModel.CurrentList = targetList;
-                return View("Index", GetViewModel());
-            }
+            ViewModel.CurrentList = targetList;
+            return View("Index", GetViewModel());
         }
 
         public ActionResult AddList(string name)
         {
-            using (TaskListContext db = new TaskListContext())
-            {
-                db.TaskLists.Add(new TaskList(name));
-                db.SaveChanges();
+            ListDb.TaskLists.Add(new TaskList(name));
+            ListDb.SaveChanges();
 
-                return View("Index", GetViewModel());
-            }
+            return View("Index", GetViewModel());
         }
+
         public ActionResult DeleteList(int Id)
         {
             if (ViewModel.CurrentList != null)
                 if (ViewModel.CurrentList.Id == Id)
                     ViewModel.CurrentList = null;
 
-            using (TaskListContext db = new TaskListContext())
-            {
-                var targetList = (from t in db.TaskLists
-                                  where t.Id == Id
-                                  select t)?.First();
 
-                db.TaskLists.Remove(targetList);
-                db.SaveChanges();
+            var targetList = (from t in ListDb.TaskLists
+                              where t.Id == Id
+                              select t)?.First();
 
-                return View("Index", GetViewModel());
-            }
+            ListDb.TaskLists.Remove(targetList);
+            ListDb.SaveChanges();
+
+            return View("Index", GetViewModel());
         }
 
         public ActionResult AddTask(string description, string color, string date)
         {
-            using (TaskContext db = new TaskContext())
-            {
-                Task NewTask = new Task(ViewModel.CurrentList.Id, description, color, date);
-                db.Tasks.Add(NewTask);
-                db.SaveChanges();
 
-                return View("Index", GetViewModel());
-            }
+            Task NewTask = new Task(ViewModel.CurrentList.Id, description, color, date);
+            TaskDb.Tasks.Add(NewTask);
+            TaskDb.SaveChanges();
+
+            return View("Index", GetViewModel());
+
         }
 
         public ActionResult DeleteTask(int Id)
         {
-            using (TaskContext db = new TaskContext())
-            {
-                var task = (from t in db.Tasks
-                            where t.Id == Id
-                            select t)?.First();
+            var task = (from t in TaskDb.Tasks
+                        where t.Id == Id
+                        select t)?.First();
 
-                db.Tasks.Remove(task);
-                db.SaveChanges();
+            TaskDb.Tasks.Remove(task);
+            TaskDb.SaveChanges();
 
-                return View("Index", GetViewModel());
-            }
-
+            return View("Index", GetViewModel());
         }
 
         public static List<Task> GetTasks()
         {
-            using (TaskContext db = new TaskContext())
+            List<Task> tasks = new List<Task>();
+
+            foreach (var task in TaskDb.Tasks)
             {
-                List<Task> tasks = new List<Task>();
-
-                foreach (var task in db.Tasks)
-                {
-                    if (ViewModel.CurrentList != null)
-                        if (task.ListId == ViewModel.CurrentList.Id)
-                            tasks.Add(task);
-                }
-
-                return tasks;
+                if (ViewModel.CurrentList != null)
+                    if (task.ListId == ViewModel.CurrentList.Id)
+                        tasks.Add(task);
             }
+
+            return tasks;
+
         }
 
         public static List<TaskList> GetTaskLists()
         {
-            using (TaskListContext db = new TaskListContext())
-            {
-                List<TaskList> taskLists = db.TaskLists?.ToList();
+            List<TaskList> taskLists = ListDb.TaskLists?.ToList();
 
-                return taskLists;
-            }
+            return taskLists;
         }
 
         public static ViewModel GetViewModel()
